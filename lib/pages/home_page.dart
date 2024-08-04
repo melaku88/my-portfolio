@@ -1,13 +1,15 @@
+
 import 'package:flutter/material.dart';
 import 'package:my_portfolio/constants/custom_colors.dart';
-import 'package:my_portfolio/widgets/custom_textfield.dart';
+import 'package:my_portfolio/services/service.dart';
+import 'package:my_portfolio/widgets/contact_desktop.dart';
+import 'package:my_portfolio/widgets/contact_mobile.dart';
 import 'package:my_portfolio/widgets/device_width.dart';
 import 'package:my_portfolio/widgets/drawer_mobile.dart';
 import 'package:my_portfolio/widgets/header_desktop.dart';
 import 'package:my_portfolio/widgets/header_mobile.dart';
 import 'package:my_portfolio/widgets/main_desktop.dart';
 import 'package:my_portfolio/widgets/main_mobile.dart';
-import 'package:my_portfolio/widgets/message_field.dart';
 import 'package:my_portfolio/widgets/skills_desktop.dart';
 import 'package:my_portfolio/widgets/skills_mobile.dart';
 
@@ -24,6 +26,15 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
+
+  sendMessage(){
+    FocusScope.of(context).unfocus();
+    Services.sendMessage(context, 
+      nameController.text.trim(), 
+      emailController.text.trim(), 
+      messageController.text.trim()
+    );
+  }
   // ------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -103,92 +114,9 @@ class _HomePageState extends State<HomePage> {
               ),
 
               // *Contact Section
-              Container(
-                width: screenWidth,
-                color: Colors.black12,
-                padding: EdgeInsets.fromLTRB(30, 38, 30, 60),
-                child: Column(
-                  children: [
-                    // title
-                    Text(
-                      'Get in touch',
-                      style: TextStyle(
-                          color: CustomColor.whitePrimary,
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold),
-                    ),
-
-                    SizedBox(
-                      height: 30.0,
-                    ),
-
-                    Row(
-                      children: [
-                        Flexible(
-                            child: MyTextField(
-                                controller: nameController,
-                                hintText: 'Your name',
-                                maxLine: 1)),
-                        SizedBox(
-                          width: 15.0,
-                        ),
-                        Flexible(
-                            child: MyTextField(
-                                controller: emailController,
-                                hintText: 'Your email',
-                                maxLine: 1))
-                      ],
-                    ),
-                    SizedBox(
-                      height: 35.0,
-                    ),
-                    MyMessageField(controller: messageController),
-
-                    SizedBox(
-                      height: 50.0,
-                    ),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.asset(
-                              'images/github.png',
-                              height: 30,
-                              width: 30.0,
-                            )),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.asset(
-                              'images/telegram.png',
-                              height: 30,
-                              width: 30.0,
-                            )),
-                        SizedBox(
-                          width: 15,
-                        ),
-                        ClipRRect(
-                            borderRadius: BorderRadius.circular(50),
-                            child: Image.asset(
-                              'images/facebook.png',
-                              height: 30,
-                              width: 30.0,
-                            ))
-                      ],
-                    )
-                  ],
-                ),
-              ),
-
-              //* footer section
-              Container(
-                  height: 100,
-                  width: double.maxFinite,
-                  color: CustomColor.scaffoldBg),
+              constraints.maxWidth >= kMinDesktopWidth 
+              ? ContactDesktop(nameController: nameController, emailController: emailController, messageController: messageController, onTap: () { sendMessage(); },)
+              : ContactMobile(nameController: nameController, emailController: emailController, messageController: messageController, onTap: () { sendMessage(); },),
             ],
           ),
         );
