@@ -8,7 +8,12 @@ class ContactMobile extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController messageController;
   final VoidCallback onTap;
-  const ContactMobile({super.key,required this.nameController, required this.emailController, required this.messageController, required this.onTap});
+  const ContactMobile(
+      {super.key,
+      required this.nameController,
+      required this.emailController,
+      required this.messageController,
+      required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -34,21 +39,17 @@ class ContactMobile extends StatelessWidget {
           ),
 
           MyTextField(
-              controller: nameController,
-              hintText: 'Your name',
-              maxLine: 1),
+              controller: nameController, hintText: 'Your name', maxLine: 1),
           SizedBox(
             height: 10.0,
           ),
           MyTextField(
-              controller: emailController,
-              hintText: 'Your email',
-              maxLine: 1),
+              controller: emailController, hintText: 'Your email', maxLine: 1),
           SizedBox(
             height: 35.0,
           ),
           MyMessageField(controller: messageController),
-          
+
           SizedBox(
             height: 30.0,
           ),
