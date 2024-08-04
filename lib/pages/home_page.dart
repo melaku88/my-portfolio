@@ -1,4 +1,5 @@
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:my_portfolio/constants/custom_colors.dart';
 import 'package:my_portfolio/services/service.dart';
@@ -23,18 +24,55 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   // ------------------------------------------------------------
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  bool isInprocess = false;
   final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController messageController = TextEditingController();
 
-  sendMessage(){
+  sendMessage() async {
+    setState(() {
+      isInprocess = true;
+    });
     FocusScope.of(context).unfocus();
-    Services.sendMessage(context, 
-      nameController.text.trim(), 
-      emailController.text.trim(), 
-      messageController.text.trim()
-    );
+    try {
+      if (nameController.text.isNotEmpty &&
+          emailController.text.isNotEmpty &&
+          messageController.text.isNotEmpty) {
+        await Services.firestore.collection('Clients').add({
+          'name': nameController.text.trim(),
+          'email': emailController.text.trim(),
+          'message': messageController.text.trim(),
+        }).then((val) {
+          setState(() {
+            isInprocess = false;
+          });
+          nameController.clear();
+          emailController.clear();
+          messageController.clear();
+          Services.snackBarSuccess(context,
+              'Thank You!\nYour message is sent successfully!\n you will get a response soon!  ');
+        });
+      } else {
+        setState(() {
+          isInprocess = false;
+        });
+        Services.snackBarError(
+            context, 'All fiels are required, please fill and try again!');
+      }
+    } on FirebaseException catch (e) {
+      setState(() {
+        isInprocess = false;
+      });
+      // ignore: use_build_context_synchronously
+      Services.snackBarError(context, e.code);
+    }
+    // Services.sendMessage(context,
+    //   nameController.text.trim(),
+    //   emailController.text.trim(),
+    //   messageController.text.trim()
+    // );
   }
+
   // ------------------------------------------------------------
   @override
   Widget build(BuildContext context) {
@@ -114,9 +152,25 @@ class _HomePageState extends State<HomePage> {
               ),
 
               // *Contact Section
-              constraints.maxWidth >= kMinDesktopWidth 
-              ? ContactDesktop(nameController: nameController, emailController: emailController, messageController: messageController, onTap: () { sendMessage(); },)
-              : ContactMobile(nameController: nameController, emailController: emailController, messageController: messageController, onTap: () { sendMessage(); },),
+              constraints.maxWidth >= kMinDesktopWidth
+                  ? ContactDesktop(
+                      nameController: nameController,
+                      emailController: emailController,
+                      messageController: messageController,
+                      onTap: () {
+                        sendMessage();
+                      },
+                      isSending: isInprocess,
+                    )
+                  : ContactMobile(
+                      nameController: nameController,
+                      emailController: emailController,
+                      messageController: messageController,
+                      onTap: () {
+                        sendMessage();
+                      },
+                      isSending: isInprocess,
+                    ),
             ],
           ),
         );

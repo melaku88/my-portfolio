@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class Services {
 
   static FirebaseFirestore firestore = FirebaseFirestore.instance;
+  static bool isSending = false;
 
   static snackBarSuccess(BuildContext context, String msg) {
     return ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -32,6 +33,7 @@ class Services {
   }
 
   static sendMessage(BuildContext context,String name, String email, String message)async{
+    isSending = true;
     try {
       if(name.isNotEmpty && email.isNotEmpty && message.isNotEmpty){
         return await firestore.collection('Clients').add({
@@ -39,12 +41,15 @@ class Services {
           'email': email,
           'message': message
         }).then((value){
+          isSending = false;
           snackBarSuccess(context, 'Your Message sent successfully!');
         });
       }else{
+        isSending = false;
         return snackBarError(context, 'All fields are required, please fill and try again!');
       }
     }on FirebaseException catch (e) {
+      isSending = false;
       return Services.snackBarError(context, e.code);
     }
   }

@@ -8,12 +8,13 @@ class ContactDesktop extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController messageController;
   final VoidCallback onTap;
+  final bool isSending;
   const ContactDesktop(
       {super.key,
       required this.nameController,
       required this.emailController,
-      required this.messageController, 
-      required this.onTap});
+      required this.messageController,
+      required this.onTap, required this.isSending});
 
   @override
   Widget build(BuildContext context) {
@@ -68,10 +69,19 @@ class ContactDesktop extends StatelessWidget {
               onPressed: onTap,
               style: OutlinedButton.styleFrom(
                   backgroundColor: Color.fromARGB(255, 15, 124, 174)),
-              child: Text(
-                'Send Message',
-                style: TextStyle(color: Colors.white),
-              )),
+              child: isSending
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text(
+                      'Send Message',
+                      style: TextStyle(color: Colors.white),
+                    )),
 
           SizedBox(
             height: 50.0,
